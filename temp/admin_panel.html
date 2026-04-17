@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Admin Panel · Climate Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #1a2a1f 0%, #2d4a2a 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 40%, rgba(60, 100, 50, 0.25), rgba(0, 0, 0, 0.2));
+            pointer-events: none;
+            z-index: 0;
+        }
+
+         
+        .glass-admin {
+            max-width: 750px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(30, 45, 28, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 2.5rem;
+            border: 1px solid rgba(255, 255, 220, 0.35);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 200, 0.08) inset;
+            padding: 2rem 2rem 2.5rem;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+         
+        .glass-admin h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e8f5e0, #b8d9a6);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 1.2rem;
+            letter-spacing: -0.3px;
+            border-left: 5px solid #7cb342;
+            padding-left: 1rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+         
+        .glass-admin button {
+            background: rgba(25, 55, 30, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 245, 180, 0.5);
+            color: #fefef0;
+            font-weight: 600;
+            padding: 0.7rem 1.5rem;
+            margin: 0.4rem 0.6rem 0.4rem 0;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-admin button:hover {
+            background: #3c7842;
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 200, 0.8);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+        }
+
+        
+        .glass-admin hr {
+            margin: 1.5rem 0 1.2rem;
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8bb56a, #c5e0b0, #8bb56a, transparent);
+        }
+
+        
+        #formBox {
+            background: rgba(25, 45, 22, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 1.8rem;
+            padding: 1.5rem 1.8rem 1.8rem;
+            margin: 1rem 0 0.5rem 0;
+            border: 1px solid rgba(210, 240, 170, 0.5);
+            transition: 0.2s;
+        }
+
+        #formBox h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #f9f7e1;
+            margin-bottom: 1.2rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            border-left: 4px solid #9ccc65;
+            padding-left: 0.8rem;
+        }
+
+         
+        .glass-admin form {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .field {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.7rem 1.2rem;
+            border-radius: 60px;
+            backdrop-filter: blur(2px);
+            margin-bottom: 0;
+        }
+
+        
+        .field label, 
+        .field {
+            color: #f2f5e6;
+            font-weight: 500;
+        }
+
+         
+        .field::before {
+            content: attr(data-label);
+            display: inline-block;
+            min-width: 110px;
+            font-weight: 600;
+            color: #e0f0d0;
+        }
+
+        
+        .field {
+            font-weight: 500;
+        }
+
+         
+        .glass-admin input[type="text"] {
+            background: #fefef5;
+            border: 1px solid #8bbd6b;
+            padding: 0.6rem 1rem;
+            border-radius: 48px;
+            font-size: 0.95rem;
+            flex: 1;
+            min-width: 200px;
+            max-width: 280px;
+            outline: none;
+            color: #1c3a1a;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .glass-admin input[type="text"]:focus {
+            border-color: #6aaa40;
+            box-shadow: 0 0 0 3px rgba(120, 180, 80, 0.4);
+            background: white;
+        }
+
+        /* submit button specific */
+        .glass-admin form button[type="submit"] {
+            background: #2c6e2f;
+            margin-top: 0.8rem;
+            padding: 0.8rem 1.8rem;
+            font-weight: bold;
+            width: fit-content;
+            border-radius: 60px;
+        }
+
+        .glass-admin form button[type="submit"]:hover {
+            background: #1f5522;
+            transform: scale(0.98);
+        }
+
+         
+        @media (max-width: 600px) {
+            .glass-admin {
+                padding: 1.5rem;
+            }
+            .field {
+                flex-direction: column;
+                align-items: flex-start;
+                border-radius: 1.2rem;
+                gap: 0.5rem;
+            }
+            .glass-admin input[type="text"] {
+                width: 100%;
+                max-width: 100%;
+            }
+            .glass-admin form button[type="submit"] {
+                width: 100%;
+            }
+            .field::before {
+                min-width: auto;
+            }
+        }
+
+        
+        .field {
+            display: none;
+        }
+
+        
+        .glass-admin form br {
+            display: none;
+        }
+
+         
+        .field {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+         
+        .field span.field-label {
+            display: inline-block;
+            min-width: 110px;
+            font-weight: 600;
+            color: #e0f0d0;
+        }
+
+        
+    </style>
+</head>
+<body>
+<div class="glass-admin">
+     
+    <h2>Admin Panel</h2>
+
+    
+    <button onclick="showForm('add_country','Add Country')">Add Country</button>
+    <button onclick="showForm('add_data','Add Data')">Add Data</button>
+    <button onclick="showForm('remove_data','Remove Data')">Remove Data</button>
+    <button onclick="showForm('update_data','Update Data')">Update Data</button>
+    <button onclick="showForm('remove_user','Remove User')">Remove User</button>
+
+    <hr>
+
+    
+    <div id="formBox" style="display:none;">
+        <h3 id="title"></h3>
+
+        <form action="/admin_action" method="POST">
+            <input type="hidden" name="action" id="action_type">
+
+             
+            <div id="country" class="field"><span class="field-label">Country:</span> <input type="text" name="country"></div>
+            <div id="region" class="field"><span class="field-label">Region:</span> <input type="text" name="region"></div>
+            <div id="ctype" class="field"><span class="field-label">Type:</span> <input type="text" name="type"></div>
+
+            <div id="year" class="field"><span class="field-label">Year:</span> <input type="text" name="year"></div>
+            <div id="temp" class="field"><span class="field-label">Temperature:</span> <input type="text" name="temp"></div>
+            <div id="sea" class="field"><span class="field-label">Sea Level:</span> <input type="text" name="sea"></div>
+            <div id="carbon" class="field"><span class="field-label">Carbon:</span> <input type="text" name="carbon"></div>
+
+            <div id="username" class="field"><span class="field-label">Username:</span> <input type="text" name="username"></div>
+
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    function showForm(type, titleText) {
+        document.getElementById("formBox").style.display = "block";
+        document.getElementById("action_type").value = type;
+        document.getElementById("title").innerText = titleText;
+
+         
+        let fields = document.querySelectorAll(".field");
+        fields.forEach(f => f.style.display = "none");
+
+         
+        if (type === "add_country") {
+            document.getElementById("country").style.display = "flex";
+            document.getElementById("region").style.display = "flex";
+            document.getElementById("ctype").style.display = "flex";
+        }
+        else if (type === "add_data") {
+            document.getElementById("country").style.display = "flex";
+            document.getElementById("year").style.display = "flex";
+            document.getElementById("temp").style.display = "flex";
+            document.getElementById("sea").style.display = "flex";
+            document.getElementById("carbon").style.display = "flex";
+        }
+        else if (type === "remove_data") {
+            document.getElementById("country").style.display = "flex";
+            document.getElementById("year").style.display = "flex";
+        }
+        else if (type === "update_data") {
+            document.getElementById("country").style.display = "flex";
+            document.getElementById("year").style.display = "flex";
+            document.getElementById("temp").style.display = "flex";
+            document.getElementById("sea").style.display = "flex";
+            document.getElementById("carbon").style.display = "flex";
+        }
+        else if (type === "remove_user") {
+            document.getElementById("username").style.display = "flex";
+        }
+    }
+</script>
+
+ 
+<style>
+     
+    .field {
+        display: none;
+        flex-direction: row;
+        align-items: center;
+        gap: 1rem;
+        background: rgba(0, 0, 0, 0.25);
+        padding: 0.7rem 1.2rem;
+        border-radius: 60px;
+        backdrop-filter: blur(2px);
+        margin-bottom: 0.5rem;
+    }
+    
+    .field-label {
+        display: inline-block;
+        min-width: 110px;
+        font-weight: 600;
+        color: #e0f0d0;
+        font-size: 0.95rem;
+    }
+    
+    .field input {
+        flex: 0 1 auto;
+        width: auto;
+        min-width: 200px;
+        max-width: 280px;
+    }
+    
+     
+    .glass-admin input[type="text"] {
+        background: #fefef5;
+        border: 1px solid #8bbd6b;
+        padding: 0.6rem 1rem;
+        border-radius: 48px;
+        font-size: 0.95rem;
+        outline: none;
+        color: #1c3a1a;
+        font-weight: 500;
+        transition: 0.2s;
+        width: 100%;
+        max-width: 260px;
+    }
+    
+     
+    @media (max-width: 600px) {
+        .field {
+            flex-direction: column;
+            align-items: flex-start;
+            border-radius: 1.2rem;
+        }
+        .field-label {
+            min-width: auto;
+            margin-bottom: 0.25rem;
+        }
+        .field input {
+            width: 100%;
+            max-width: 100%;
+        }
+        .glass-admin input[type="text"] {
+            max-width: 100%;
+        }
+    }
+    
+     
+    .glass-admin form button[type="submit"] {
+        background: #2c6e2f;
+        margin-top: 0.8rem;
+        padding: 0.8rem 1.8rem;
+        font-weight: bold;
+        width: fit-content;
+        border-radius: 60px;
+        border: 1px solid rgba(255, 245, 180, 0.5);
+        color: #fefef0;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .glass-admin form button[type="submit"]:hover {
+        background: #1f5522;
+        transform: scale(0.98);
+    }
+    
+     
+    .glass-admin form br {
+        display: none;
+    }
+</style>
+
+</body>
+</html>

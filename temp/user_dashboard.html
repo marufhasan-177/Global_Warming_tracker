@@ -24,7 +24,7 @@
         }
 
         .glass-dashboard {
-            max-width: 1300px;
+            max-width: 1400px;
             width: 100%;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.35);
@@ -218,6 +218,11 @@
             width: 100%;
         }
 
+        /* New style for overall info table - keeping consistent design */
+        #overallTableWrapper {
+            margin-top: 1.5rem;
+        }
+
         @media (max-width: 700px) {
             .glass-dashboard {
                 padding: 1.5rem;
@@ -243,6 +248,9 @@
     <button onclick="showBox('temp','Temperature Info')">Temperature Info</button>
     <button onclick="showBox('sea','Sea Level Info')">Sea Level Info</button>
     <button onclick="showBox('carbon','Carbon Emission Info')">Carbon Emission Info</button>
+    
+    <!-- NEW BUTTON: Overall Info - added without changing any existing elements -->
+    <button onclick="showOverallBox()">🌍 Overall Info</button>
 
     <hr>
 
@@ -252,6 +260,15 @@
             <input type="hidden" name="data_type" id="data_type">
             Country: <input type="text" name="country" id="countryInput"><br><br>
             <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <!-- NEW SEARCH BOX for Overall Info - separate but styled identically -->
+    <div id="overallSearchBox" style="display:none;">
+        <h3 id="overallTitle">🌍 Overall Climate Data</h3>
+        <form action="/overall" method="POST" id="overallForm">
+            Country: <input type="text" name="country" id="overallCountryInput" placeholder="Enter country name"><br><br>
+            <button type="submit">Search Overall Data</button>
         </form>
     </div>
 
@@ -273,7 +290,7 @@
                 {% for row in data %}
                 <tr>
                     <td class="country-col">{{ row[0] }}</td>
-                    <td class="year-col">{{ row[1] }}</td>
+                    <td class="year-col">{{ row[1] }}}</td>
                     <td class="value-col">{{ row[2] }}</td>
                 </tr>
                 {% endfor %}
@@ -282,7 +299,38 @@
     </div>
     {% endif %}
 
-    <!-- GRAPH SECTION - FIXED: removed problematic inline Jinja condition -->
+    <!-- NEW TABLE SECTION for Overall Info - displays country, year, temperature, sea level, carbon emission -->
+    {% if overall_data %}
+    <div id="overallTableWrapper">
+        <h3>📊 Complete Climate Profile</h3>
+        <div class="table-wrapper">
+            <table border="1" id="overallTable">
+                <thead>
+                    <tr>
+                        <th>Country</th>
+                        <th>Year</th>
+                        <th>Temperature (°C)</th>
+                        <th>Sea Level (mm)</th>
+                        <th>Carbon Emission (kt)</th>
+                    </tr>
+                </thead>
+                <tbody id="overallTableBody">
+                    {% for row in overall_data %}
+                    <tr>
+                        <td>{{ row[0] }}</td>
+                        <td>{{ row[1] }}</td>
+                        <td>{{ row[2] }}</td>
+                        <td>{{ row[3] }}</td>
+                        <td>{{ row[4] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- GRAPH SECTION - only shows for temp/sea/carbon searches, not for overall -->
     <div id="graphSection" style="display: none;">
         <div class="graph-container">
             <h4 id="graphTitle">📈 Trend Visualization</h4>
@@ -292,15 +340,33 @@
 
 </div>
 
-<!-- Original script - showBox function preserved -->
 <script>
     // ORIGINAL FUNCTION (unchanged)
     function showBox(type, label) {
+        // Hide overall search box if visible
+        document.getElementById("overallSearchBox").style.display = "none";
         document.getElementById("searchBox").style.display = "block";
         document.getElementById("data_type").value = type;
         document.getElementById("title").innerText = "Search " + label;
         window.currentDataType = type;
         window.currentLabel = label;
+        // Clear any overall table display (optional, keeps UI clean)
+        const overallWrapper = document.getElementById("overallTableWrapper");
+        if (overallWrapper) overallWrapper.style.display = "none";
+    }
+    
+    // NEW FUNCTION: Show Overall Info search box
+    function showOverallBox() {
+        // Hide regular search box
+        document.getElementById("searchBox").style.display = "none";
+        // Show overall search box
+        document.getElementById("overallSearchBox").style.display = "block";
+        // Hide graph section for overall data (no graph needed)
+        document.getElementById("graphSection").style.display = "none";
+        // Clear any previous regular table display message (optional)
+        window.currentDataType = 'overall';
+        // Store in session that we're in overall mode
+        sessionStorage.setItem('lastDataType', 'overall');
     }
 
     // Helper: update table header based on data_type
@@ -318,8 +384,14 @@
         }
     }
 
-    // Function to render chart from table data
+    
     function renderChartFromTable(dataType) {
+         
+        if (dataType === 'overall') {
+            document.getElementById('graphSection').style.display = 'none';
+            return;
+        }
+        
         const canvas = document.getElementById('climateChart');
         if (!canvas) return;
         
@@ -420,29 +492,54 @@
         document.getElementById('graphSection').style.display = 'block';
     }
     
-    // Store data type before form submission
+     
     function attachFormSubmitHandler() {
         const form = document.querySelector('#dashboardForm');
-        if (!form) return;
-        form.addEventListener('submit', function() {
-            const dataTypeInput = document.getElementById('data_type');
-            if (dataTypeInput && dataTypeInput.value) {
-                sessionStorage.setItem('lastDataType', dataTypeInput.value);
-            }
-        });
+        if (form) {
+            form.addEventListener('submit', function() {
+                const dataTypeInput = document.getElementById('data_type');
+                if (dataTypeInput && dataTypeInput.value) {
+                    sessionStorage.setItem('lastDataType', dataTypeInput.value);
+                }
+                 
+                sessionStorage.setItem('isOverallMode', 'false');
+            });
+        }
+        
+         
+        const overallForm = document.querySelector('#overallForm');
+        if (overallForm) {
+            overallForm.addEventListener('submit', function() {
+                sessionStorage.setItem('lastDataType', 'overall');
+                sessionStorage.setItem('isOverallMode', 'true');
+            });
+        }
     }
     
-    // On page load, check if table has data and update accordingly
+    
     function applyDynamicHeadersAndGraph() {
-        const tableExists = document.querySelector('#tableBody tr');
-        if (!tableExists) {
+         
+        const overallTableBody = document.querySelector('#overallTableBody tr');
+        const regularTableBody = document.querySelector('#tableBody tr');
+        
+         
+        if (overallTableBody) {
+            document.getElementById('graphSection').style.display = 'none';
+            const overallWrapper = document.getElementById('overallTableWrapper');
+            if (overallWrapper) overallWrapper.style.display = 'block';
+             
+            return;
+        }
+        
+         
+        if (!regularTableBody) {
             document.getElementById('graphSection').style.display = 'none';
             return;
         }
         
         let dataType = sessionStorage.getItem('lastDataType');
         
-        if (!dataType) {
+        if (!dataType || dataType === 'overall') {
             const dataTypeInput = document.getElementById('data_type');
             if (dataTypeInput && dataTypeInput.value) {
                 dataType = dataTypeInput.value;
@@ -454,11 +551,11 @@
             }
         }
         
-        if (dataType) {
+        if (dataType && dataType !== 'overall') {
             window.currentDataType = dataType;
             updateTableHeaderBasedOnType(dataType);
             renderChartFromTable(dataType);
-        } else {
+        } else if (regularTableBody) {
             renderChartFromTable('generic');
         }
     }
@@ -468,20 +565,37 @@
     window.showBox = function(type, label) {
         originalShowBox(type, label);
         sessionStorage.setItem('lastDataType', type);
+        sessionStorage.setItem('isOverallMode', 'false');
+        // Hide overall wrapper if visible
+        const overallWrapper = document.getElementById('overallTableWrapper');
+        if (overallWrapper) overallWrapper.style.display = 'none';
     };
     
     // Initialize on page load
     window.addEventListener('DOMContentLoaded', function() {
         attachFormSubmitHandler();
         applyDynamicHeadersAndGraph();
+        
+        // Hide overall wrapper initially if no overall data
+        const overallTableBody = document.querySelector('#overallTableBody tr');
+        const overallWrapper = document.getElementById('overallTableWrapper');
+        if (overallWrapper && !overallTableBody) {
+            overallWrapper.style.display = 'none';
+        }
+        
+        // If coming from overall mode, ensure search box state is correct
+        const isOverallMode = sessionStorage.getItem('isOverallMode');
+        if (isOverallMode === 'true') {
+            document.getElementById('searchBox').style.display = 'none';
+            document.getElementById('graphSection').style.display = 'none';
+        }
     });
 </script>
 
-<!-- Sample data for demonstration (remove this in production - it's just to show the graph works) -->
-<!-- This div contains example data that will be replaced by your actual Jinja backend -->
+<!-- Sample data note (for developers) -->
 <div style="display: none;" id="demoDataNote">
-    Note: When you have actual backend data, the graph will work automatically.
-    For demo purposes, you can uncomment the sample data below to test the graph.
+    Note: For Overall Info to work, your backend should accept POST requests to '/overall'
+    and return an array 'overall_data' with rows containing [country, year, temperature, sea_level, carbon_emission]
 </div>
 
 </body>
