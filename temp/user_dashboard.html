@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Dashboard · Tracker with Graph</title>
+    <!-- Chart.js CDN for graphing -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #eef5ea 0%, #d4e2ca 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .glass-dashboard {
+            max-width: 1300px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-radius: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 25px 45px -12px rgba(0, 32, 0, 0.35);
+            padding: 2rem 2rem 2.2rem;
+            transition: all 0.2s;
+        }
+
+        .glass-dashboard h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #1c4e2d, #2c7a47);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.3px;
+            border-left: 5px solid #2e7d32;
+            padding-left: 1rem;
+        }
+
+        .glass-dashboard button {
+            background: rgba(30, 60, 35, 0.8);
+            backdrop-filter: blur(4px);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.7rem 1.5rem;
+            margin: 0.4rem 0.6rem 0.4rem 0;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,210,0.4);
+        }
+
+        .glass-dashboard button:hover {
+            background: #2c6e3c;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+        }
+
+        hr {
+            margin: 1.2rem 0;
+            border: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #7d9f6e, #bddb9b, #7d9f6e, transparent);
+        }
+
+        #searchBox {
+            background: rgba(40, 55, 35, 0.65);
+            backdrop-filter: blur(8px);
+            border-radius: 1.8rem;
+            padding: 1.2rem 1.8rem 1.8rem;
+            margin: 1rem 0 0.8rem 0;
+            border: 1px solid rgba(255,250,200,0.5);
+            transition: 0.2s;
+        }
+
+        #searchBox h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #faf7e1;
+            margin-bottom: 1rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border-left: 4px solid #b9f6a5;
+            padding-left: 0.8rem;
+        }
+
+        .glass-dashboard form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .glass-dashboard form input[type="text"] {
+            background: #fefef7;
+            border: 1px solid #7faa6b;
+            padding: 0.7rem 1rem;
+            border-radius: 48px;
+            font-size: 0.95rem;
+            width: 240px;
+            outline: none;
+            color: #1e2f1c;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .glass-dashboard form input[type="text"]:focus {
+            border-color: #2c7840;
+            box-shadow: 0 0 0 3px rgba(70, 140, 70, 0.3);
+            background: white;
+        }
+
+        .glass-dashboard form button[type="submit"] {
+            background: #2b5e2f;
+            margin: 0;
+            padding: 0.7rem 1.8rem;
+            font-weight: bold;
+        }
+
+        .glass-dashboard form button[type="submit"]:hover {
+            background: #1e4823;
+            transform: scale(0.97);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+            border-radius: 1.5rem;
+            background: rgba(255, 255, 245, 0.5);
+            backdrop-filter: blur(4px);
+            padding: 0.25rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 250, 240, 0.9);
+            border-radius: 1.2rem;
+            overflow: hidden;
+            box-shadow: 0 6px 14px rgba(0, 20, 0, 0.15);
+            font-size: 0.95rem;
+        }
+
+        table th, table td {
+            padding: 14px 18px;
+            text-align: left;
+            border-bottom: 1px solid #cbdcc0;
+        }
+
+        table th {
+            background: #2c5e2f;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #b1da9b;
+        }
+
+        table td {
+            background-color: rgba(255, 255, 245, 0.95);
+            color: #1c3518;
+            font-weight: 500;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        table tr:hover td {
+            background-color: #e9f3e2;
+        }
+
+        table td:first-child, table th:first-child {
+            padding-left: 1.5rem;
+        }
+        table td:last-child, table th:last-child {
+            padding-right: 1.5rem;
+        }
+
+        .graph-container {
+            margin-top: 2rem;
+            background: rgba(255, 255, 245, 0.7);
+            backdrop-filter: blur(6px);
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid rgba(100, 120, 80, 0.3);
+            transition: all 0.2s;
+        }
+
+        .graph-container h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1a472a;
+            margin-bottom: 1rem;
+            padding-left: 0.5rem;
+            border-left: 4px solid #4caf50;
+        }
+
+        canvas {
+            max-height: 350px;
+            width: 100%;
+        }
+
+        @media (max-width: 700px) {
+            .glass-dashboard {
+                padding: 1.5rem;
+            }
+            .glass-dashboard form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .glass-dashboard form input[type="text"] {
+                width: 100%;
+            }
+            table th, table td {
+                padding: 10px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="glass-dashboard">
+    <!-- Original content - completely unchanged -->
+    <h2>User Dashboard</h2>
+
+    <button onclick="showBox('temp','Temperature Info')">Temperature Info</button>
+    <button onclick="showBox('sea','Sea Level Info')">Sea Level Info</button>
+    <button onclick="showBox('carbon','Carbon Emission Info')">Carbon Emission Info</button>
+
+    <hr>
+
+    <div id="searchBox" style="display:none;">
+        <h3 id="title"></h3>
+        <form action="/search" method="POST" id="dashboardForm">
+            <input type="hidden" name="data_type" id="data_type">
+            Country: <input type="text" name="country" id="countryInput"><br><br>
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <hr>
+
+    <!-- TABLE SECTION - Jinja template preserved exactly as original -->
+    {% if data %}
+    <h3>Result</h3>
+    <div class="table-wrapper">
+        <table border="1" id="dataTable">
+            <thead>
+                <tr>
+                    <th id="headerCountry">Country</th>
+                    <th id="headerYear">Year</th>
+                    <th id="headerValue">Value</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                {% for row in data %}
+                <tr>
+                    <td class="country-col">{{ row[0] }}</td>
+                    <td class="year-col">{{ row[1] }}</td>
+                    <td class="value-col">{{ row[2] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- GRAPH SECTION - FIXED: removed problematic inline Jinja condition -->
+    <div id="graphSection" style="display: none;">
+        <div class="graph-container">
+            <h4 id="graphTitle">📈 Trend Visualization</h4>
+            <canvas id="climateChart" width="800" height="350" style="max-width:100%; height:auto;"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- Original script - showBox function preserved -->
+<script>
+    // ORIGINAL FUNCTION (unchanged)
+    function showBox(type, label) {
+        document.getElementById("searchBox").style.display = "block";
+        document.getElementById("data_type").value = type;
+        document.getElementById("title").innerText = "Search " + label;
+        window.currentDataType = type;
+        window.currentLabel = label;
+    }
+
+    // Helper: update table header based on data_type
+    function updateTableHeaderBasedOnType(dataType) {
+        const valueHeader = document.getElementById("headerValue");
+        if (!valueHeader) return;
+        if (dataType === 'temp') {
+            valueHeader.innerText = 'Temperature (°C)';
+        } else if (dataType === 'sea') {
+            valueHeader.innerText = 'Sea Level (mm)';
+        } else if (dataType === 'carbon') {
+            valueHeader.innerText = 'Carbon Emission Rate (kt)';
+        } else {
+            valueHeader.innerText = 'Value';
+        }
+    }
+
+    // Function to render chart from table data
+    function renderChartFromTable(dataType) {
+        const canvas = document.getElementById('climateChart');
+        if (!canvas) return;
+        
+        if (window.climateChartObj && typeof window.climateChartObj.destroy === 'function') {
+            window.climateChartObj.destroy();
+        }
+        
+        const tableRows = document.querySelectorAll('#tableBody tr');
+        if (!tableRows.length) {
+            document.getElementById('graphSection').style.display = 'none';
+            return;
+        }
+        
+        const years = [];
+        const values = [];
+        for (let row of tableRows) {
+            const yearCell = row.querySelector('.year-col');
+            const valueCell = row.querySelector('.value-col');
+            if (yearCell && valueCell) {
+                let yearVal = parseFloat(yearCell.innerText.trim());
+                let valueVal = parseFloat(valueCell.innerText.trim());
+                if (!isNaN(yearVal) && !isNaN(valueVal)) {
+                    years.push(yearVal);
+                    values.push(valueVal);
+                }
+            }
+        }
+        
+        if (years.length === 0) {
+            document.getElementById('graphSection').style.display = 'none';
+            return;
+        }
+        
+        let yLabel = 'Value';
+        let graphMainTitle = 'Climate Data Trend';
+        if (dataType === 'temp') {
+            yLabel = 'Temperature (°C)';
+            graphMainTitle = '🌡️ Temperature Trend (Year vs °C)';
+        } else if (dataType === 'sea') {
+            yLabel = 'Sea Level (mm)';
+            graphMainTitle = '🌊 Sea Level Rise Trend (Year vs mm)';
+        } else if (dataType === 'carbon') {
+            yLabel = 'Carbon Emission (kt)';
+            graphMainTitle = '🏭 Carbon Emission Trend (Year vs kt)';
+        }
+        
+        const graphTitleElem = document.getElementById('graphTitle');
+        if (graphTitleElem) graphTitleElem.innerText = graphMainTitle;
+        
+        const ctx = canvas.getContext('2d');
+        window.climateChartObj = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: years,
+                datasets: [{
+                    label: yLabel,
+                    data: values,
+                    borderColor: '#2c6e3c',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#1b5e2a',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    tension: 0.2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw}`;
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        labels: { font: { size: 13, weight: 'bold' }, color: '#1c441e' }
+                    }
+                },
+                scales: {
+                    y: {
+                        title: { display: true, text: yLabel, color: '#2d5a2c', font: { weight: 'bold' } },
+                        grid: { color: '#c8e0bc' },
+                        beginAtZero: false
+                    },
+                    x: {
+                        title: { display: true, text: 'Year', color: '#2d5a2c', font: { weight: 'bold' } },
+                        grid: { color: '#d0e6c4' }
+                    }
+                }
+            }
+        });
+        document.getElementById('graphSection').style.display = 'block';
+    }
+    
+    // Store data type before form submission
+    function attachFormSubmitHandler() {
+        const form = document.querySelector('#dashboardForm');
+        if (!form) return;
+        form.addEventListener('submit', function() {
+            const dataTypeInput = document.getElementById('data_type');
+            if (dataTypeInput && dataTypeInput.value) {
+                sessionStorage.setItem('lastDataType', dataTypeInput.value);
+            }
+        });
+    }
+    
+    // On page load, check if table has data and update accordingly
+    function applyDynamicHeadersAndGraph() {
+        const tableExists = document.querySelector('#tableBody tr');
+        if (!tableExists) {
+            document.getElementById('graphSection').style.display = 'none';
+            return;
+        }
+        
+        let dataType = sessionStorage.getItem('lastDataType');
+        
+        if (!dataType) {
+            const dataTypeInput = document.getElementById('data_type');
+            if (dataTypeInput && dataTypeInput.value) {
+                dataType = dataTypeInput.value;
+            } else {
+                const titleElem = document.getElementById('title');
+                if (titleElem && titleElem.innerText.includes('Temperature')) dataType = 'temp';
+                else if (titleElem && titleElem.innerText.includes('Sea Level')) dataType = 'sea';
+                else if (titleElem && titleElem.innerText.includes('Carbon')) dataType = 'carbon';
+            }
+        }
+        
+        if (dataType) {
+            window.currentDataType = dataType;
+            updateTableHeaderBasedOnType(dataType);
+            renderChartFromTable(dataType);
+        } else {
+            renderChartFromTable('generic');
+        }
+    }
+    
+    // Enhanced showBox that also stores type
+    const originalShowBox = window.showBox;
+    window.showBox = function(type, label) {
+        originalShowBox(type, label);
+        sessionStorage.setItem('lastDataType', type);
+    };
+    
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', function() {
+        attachFormSubmitHandler();
+        applyDynamicHeadersAndGraph();
+    });
+</script>
+
+<!-- Sample data for demonstration (remove this in production - it's just to show the graph works) -->
+<!-- This div contains example data that will be replaced by your actual Jinja backend -->
+<div style="display: none;" id="demoDataNote">
+    Note: When you have actual backend data, the graph will work automatically.
+    For demo purposes, you can uncomment the sample data below to test the graph.
+</div>
+
+</body>
+</html>

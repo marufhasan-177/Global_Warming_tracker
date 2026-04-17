@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Global Warming Tracker · Login Portal</title>
+    <style>
+       
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #0a2f2c 0%, #1b6b4e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            margin: 0;
+            position: relative;
+        }
+
+        /* subtle earth-tone overlay for better mood (does NOT change original content) */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 30%, rgba(30,80,50,0.3), rgba(0,0,0,0.2));
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ----- TRANSPARENT BLURRY BOX (centers everything) ----- */
+        .glass-aura {
+            width: 100%;
+            max-width: 620px;
+            margin: 0 auto;
+            background: rgba(15, 25, 20, 0.35);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+            padding: 2rem 2rem 2.5rem;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        
+        .climate-header {
+            text-align: center;
+            margin-bottom: 1.25rem;
+            border-bottom: 2px solid rgba(255, 255, 200, 0.4);
+            display: inline-block;
+            width: 100%;
+        }
+        .climate-header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e9f5e1, #c0f0d8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            letter-spacing: -0.3px;
+            margin-bottom: 0.4rem;
+            display: inline-block;
+        }
+        .climate-tag {
+            font-size: 0.8rem;
+            color: rgba(255,250,210,0.9);
+            letter-spacing: 0.5px;
+            margin-top: -5px;
+            display: block;
+        }
+
+        
+        .glass-aura h2,
+        .glass-aura h3,
+        .glass-aura button,
+        .glass-aura form,
+        .glass-aura input,
+        .glass-aura hr {
+            color: white;
+        }
+
+        .glass-aura h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin: 0.5rem 0 0.8rem 0;
+        }
+
+        .glass-aura h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin: 0.75rem 0 1rem 0;
+            border-left: 4px solid #8bc34a;
+            padding-left: 0.85rem;
+            color: #f8f9e6;
+        }
+
+        
+        .glass-aura button {
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,220,0.5);
+            color: #fefef5;
+            font-weight: 600;
+            padding: 0.6rem 1.3rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-right: 0.6rem;
+            margin-bottom: 0.6rem;
+            font-size: 0.95rem;
+        }
+
+        .glass-aura button:hover {
+            background: rgba(80, 120, 80, 0.7);
+            border-color: rgba(255,255,210,0.9);
+            transform: scale(0.97);
+        }
+
+        
+        .glass-aura form {
+            margin-top: 1rem;
+            background: rgba(0, 0, 0, 0.55);
+            padding: 1.5rem 1.8rem;
+            border-radius: 1.5rem;
+            backdrop-filter: blur(2px);
+            box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+        }
+
+        
+        .glass-aura input[type="text"],
+        .glass-aura input[type="password"] {
+            background: #1e2a28;
+            border: 1px solid #9bbf8f;
+            padding: 0.7rem 1rem;
+            border-radius: 48px;
+            width: 240px;
+            font-size: 1rem;
+            margin-left: 0.75rem;
+            outline: none;
+            transition: 0.2s;
+            color: #f2f7e9;
+            font-weight: 500;
+        }
+
+        
+        .glass-aura input::placeholder {
+            color: #bfd9b5;
+            font-weight: 400;
+            opacity: 0.8;
+        }
+
+        .glass-aura input:focus {
+            background: #2c3f3a;
+            border-color: #d4e6b0;
+            box-shadow: 0 0 0 2px rgba(180, 230, 140, 0.5);
+            color: white;
+        }
+
+        
+        .glass-aura form, 
+        .glass-aura form label,
+        .glass-aura form br + span,
+        .glass-aura form {
+            color: #f2f2e0;
+            font-weight: 500;
+        }
+
+        
+        .glass-aura form {
+            color: #fcf9ea;
+        }
+
+        
+        .glass-aura hr {
+            margin: 1.2rem 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(210,240,170,0.7), transparent);
+        }
+
+        
+        @media (max-width: 550px) {
+            .glass-aura {
+                padding: 1.5rem;
+            }
+            .glass-aura input[type="text"],
+            .glass-aura input[type="password"] {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 0.5rem;
+            }
+            .glass-aura form br {
+                display: none;
+            }
+            .glass-aura form {
+                display: flex;
+                flex-direction: column;
+                gap: 0.9rem;
+            }
+            .glass-aura form input {
+                width: 100%;
+            }
+            .glass-aura button[type="submit"] {
+                align-self: flex-start;
+            }
+        }
+
+        
+        .glass-aura input {
+            caret-color: #c1f0a0;
+        }
+    </style>
+</head>
+<body>
+    <div class="glass-aura">
+        
+        <div class="climate-header">
+            <h1>🌍 Global Warming Tracker</h1>
+            <div class="climate-tag">View · Learn · Implement</div>
+        </div>
+
+        
+        <h2>Select Login Type</h2>
+
+        <button onclick="showUserLogin()">Login as User</button>
+        <button onclick="showAdminLogin()">Login as Admin</button>
+        <button onclick="showCreate()">Create User Account</button>
+
+        <hr>
+
+        <!-- User Login -->
+        <div id="userForm" style="display:none;">
+            <h3>User Login</h3>
+            <form action="/login" method="POST">
+                <input type="hidden" name="role" value="user">
+
+                Username: <input type="text" name="username" required><br><br>
+                Password: <input type="password" name="password" required><br><br>
+
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <!-- Admin Login -->
+        <div id="adminForm" style="display:none;">
+            <h3>Admin Login</h3>
+            <form action="/login" method="POST">
+                <input type="hidden" name="role" value="admin">
+
+                Admin Username: <input type="text" name="username" required><br><br>
+                Password: <input type="password" name="password" required><br><br>
+
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <!-- Create Account -->
+        <div id="CreateForm" style="display:none;">
+            <h3>Create Account</h3>
+            <form action="/create" method="POST">
+                Username: <input type="text" name="username" required><br><br>
+                Password: <input type="password" name="password" required><br><br>
+
+                <button type="submit">Create</button>
+            </form>
+        </div>
+    </div>
+
+    <!--  JavaScript functions  -->
+    <script>
+        function showUserLogin() {
+            document.getElementById("userForm").style.display = "block";
+            document.getElementById("adminForm").style.display = "none";
+            document.getElementById("CreateForm").style.display = "none";
+        }
+
+        function showAdminLogin() {
+            document.getElementById("adminForm").style.display = "block";
+            document.getElementById("userForm").style.display = "none";
+            document.getElementById("CreateForm").style.display = "none";
+        }
+
+        function showCreate() {
+            document.getElementById("CreateForm").style.display = "block";
+            document.getElementById("userForm").style.display = "none";
+            document.getElementById("adminForm").style.display = "none";
+        }
+    </script>
+</body>
+</html>
