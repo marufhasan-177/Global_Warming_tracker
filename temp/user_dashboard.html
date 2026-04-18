@@ -217,8 +217,21 @@
             max-height: 350px;
             width: 100%;
         }
+        .climate-header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e9f5e1, #c0f0d8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            letter-spacing: -0.3px;
+            margin-bottom: 0.4rem;
+            display: inline-block;
+            color: rgb(157, 216, 166);
+        }
 
-        /* New style for overall info table - keeping consistent design */
+        
         #overallTableWrapper {
             margin-top: 1.5rem;
         }
@@ -242,6 +255,10 @@
 </head>
 <body>
 <div class="glass-dashboard">
+    <div class="climate-header">
+            <h1>🌍 Global Warming Tracker</h1>
+            
+    </div>
     <!-- Original content - completely unchanged -->
     <h2>User Dashboard</h2>
 
@@ -290,7 +307,7 @@
                 {% for row in data %}
                 <tr>
                     <td class="country-col">{{ row[0] }}</td>
-                    <td class="year-col">{{ row[1] }}}</td>
+                    <td class="year-col">{{ row[1] }}</td>
                     <td class="value-col">{{ row[2] }}</td>
                 </tr>
                 {% endfor %}

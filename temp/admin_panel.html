@@ -196,6 +196,20 @@
             transform: scale(0.98);
         }
 
+        .climate-header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e9f5e1, #c0f0d8);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            letter-spacing: -0.3px;
+            margin-bottom: 0.4rem;
+            display: inline-block;
+            color: rgb(157, 216, 166);
+            
+        }
          
         @media (max-width: 600px) {
             .glass-admin {
@@ -249,6 +263,10 @@
 </head>
 <body>
 <div class="glass-admin">
+    <div class="glass-dashboard">
+    <div class="climate-header">
+        <h1>🌍 Global Warming Tracker<br></h1>           
+    </div>
      
     <h2>Admin Panel</h2>
 
@@ -269,14 +287,14 @@
             <input type="hidden" name="action" id="action_type">
 
              
-            <div id="country" class="field"><span class="field-label">Country:</span> <input type="text" name="country"></div>
-            <div id="region" class="field"><span class="field-label">Region:</span> <input type="text" name="region"></div>
-            <div id="ctype" class="field"><span class="field-label">Type:</span> <input type="text" name="type"></div>
+            <div id="country" class="field"><span class="field-label">Country:</span> <input type="text" name="country" ></div>
+            <div id="region" class="field"><span class="field-label">Region:</span> <input type="text" name="region" ></div>
+            <div id="ctype" class="field"><span class="field-label">Type:</span> <input type="text" name="type" ></div>
 
-            <div id="year" class="field"><span class="field-label">Year:</span> <input type="text" name="year"></div>
-            <div id="temp" class="field"><span class="field-label">Temperature:</span> <input type="text" name="temp"></div>
-            <div id="sea" class="field"><span class="field-label">Sea Level:</span> <input type="text" name="sea"></div>
-            <div id="carbon" class="field"><span class="field-label">Carbon:</span> <input type="text" name="carbon"></div>
+            <div id="year" class="field"><span class="field-label">Year:</span> <input type="text" name="year" ></div>
+            <div id="temp" class="field"><span class="field-label">Temperature:</span> <input type="text" name="temp" ></div>
+            <div id="sea" class="field"><span class="field-label">Sea Level:</span> <input type="text" name="sea" ></div>
+            <div id="carbon" class="field"><span class="field-label">Carbon:</span> <input type="text" name="carbon" ></div>
 
             <div id="username" class="field"><span class="field-label">Username:</span> <input type="text" name="username"></div>
 
